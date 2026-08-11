@@ -13,34 +13,54 @@ public class JsonPlaceholderSimulation extends Simulation {
         .baseUrl("https://jsonplaceholder.typicode.com")
         .acceptHeader("application/json");
 
-    ScenarioBuilder scenario = scenario("Browse Posts")
+    // 2. Scenario - describes what one virtual user does
+    ScenarioBuilder scenario = scenario("Correlation Practice")
 
-    .exec(
-        http("Get Post 1")
-            .get("/posts/1")
-            .check(status().is(200))
-    )
+        // Request #1
+        // Get a post and extract userId from the JSON response
+        .exec(
+            http("Get Post 1")
+                .get("/posts/1")
+                .check(status().is(200))
+                .check(
+                    jsonPath("$.userId").saveAs("userId")
+                )
+        )
 
-    .pause(1)
+        // Print the captured value so we can see that
+        // Gatling stored it in the Session
+        .exec(session -> {
+            System.out.println(
+                "Captured userId = " + session.getString("userId")
+            );
 
-    .exec(
-        http("Get Post 2")
-            .get("/posts/2")
-            .check(status().is(200))
-    )
+            return session;
+        })
 
-    .pause(1)
+        .pause(1)
 
-    .exec(
-        http("Get Users")
-            .get("/users")
-            .check(status().is(200))
-    );
+        // Request #2
+        .exec(
+            http("Get Post 2")
+                .get("/posts/2")
+                .check(status().is(200))
+        )
 
+        .pause(1)
+
+        // Request #3
+        .exec(
+            http("Get Users")
+                .get("/users")
+                .check(status().is(200))
+        );
+
+
+    // 3. Load configuration
     {
         setUp(
             scenario.injectOpen(
-                rampUsers(5).during(10)
+                atOnceUsers(1)
             )
         ).protocols(httpProtocol);
     }
