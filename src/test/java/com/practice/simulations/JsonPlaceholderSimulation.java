@@ -43,6 +43,23 @@ public class JsonPlaceholderSimulation extends Simulation {
         // and put its values into the Gatling Session.
         .feed(shipmentFeeder)
 
+
+    .exec(
+        http("Create Shipment")
+            .post("/posts")
+            .header("Content-Type", "application/json")
+            .body(
+                ElFileBody("bodies/create-shipment.json")
+            )
+            .check(status().is(201))
+    )
+
+    .pause(1)
+
+
+
+
+
         // Print shipment information from the Session.
         // This is just for learning/debugging.
         .exec(session -> {

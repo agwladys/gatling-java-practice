@@ -1,0 +1,7 @@
+{
+  "shipmentRef": "#{shipmentRef}",
+  "originZip": "#{originZip}",
+  "destinationZip": "#{destinationZip}",
+  "weight": #{weight},
+  "serviceType": "#{serviceType}"
+}
