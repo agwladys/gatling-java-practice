@@ -67,13 +67,28 @@ public class JsonPlaceholderSimulation extends Simulation {
         // SEARCH CREATED SHIPMENT
         // ---------------------------------------------
         .exec(
-            http("Search Created Shipment")
-                .get("/posts/#{createdShipmentId}")
+    http("Search Created Shipment")
+        .get("/posts/#{createdShipmentId}")
+        .check(status().is(404))
+)
 
-                // JSONPlaceholder doesn't persist POSTs,
-                // so 404 is expected for this practice API.
-                .check(status().is(404))
-        );
+.pause(1)
+
+.exec(
+    http("Return Shipment")
+        .delete("/posts/#{createdShipmentId}")
+        .check(status().is(200))
+)
+
+.pause(1)
+
+.exec(
+    http("Verify Returned Shipment")
+        .get("/posts/#{createdShipmentId}")
+        .check(status().is(404))
+);
+
+
 
 
     // Load configuration
