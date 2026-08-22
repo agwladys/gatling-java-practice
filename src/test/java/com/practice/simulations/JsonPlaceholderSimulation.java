@@ -19,7 +19,7 @@ public class JsonPlaceholderSimulation extends Simulation {
 
     // Synthetic shipment test data
     FeederBuilder<String> shipmentFeeder =
-        csv("data/shipments.csv").queue();
+        csv("data/shipments.csv").circular();
 
 
     // Shipment scenario
@@ -92,11 +92,17 @@ public class JsonPlaceholderSimulation extends Simulation {
 
 
     // Load configuration
+    
     {
-        setUp(
-            scenario.injectOpen(
-                atOnceUsers(5)
-            )
-        ).protocols(httpProtocol);
-    }
+    setUp(
+        scenario.injectOpen(
+            rampUsers(20).during(30)
+        )
+    )
+    .protocols(httpProtocol)
+    .assertions(
+        global().failedRequests().percent().lt(1.0),
+        global().responseTime().percentile(95).lt(500)
+    );
 }
+}   
